@@ -5,6 +5,7 @@
 ## General info
 This Tool is get the Rightsizing Recommendations from Cost Explorer for your AWS Account / Organization.
 
+![Example](static/example.jpg)
 ## Tool info:
 |Version |Author  | 
 --- | --- |
