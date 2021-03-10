@@ -31,4 +31,4 @@ This Tool is get the [Rightsizing Recommendations](https://docs.aws.amazon.com/a
 `python3 -m venv rightsizingrecommendations`
 
 2. Activate virtual env:
-`source orgtool/bin/activate`
+`source rightsizingrecommendations/bin/activate`
