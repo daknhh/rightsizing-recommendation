@@ -3,7 +3,7 @@
 * [Usage](#usage)
 
 ## General info
-This Tool is get the Rightsizing Recommendations from Cost Explorer for your AWS Account / Organization.
+This Tool is get the [Rightsizing Recommendations](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-rightsizing.html) from Cost Explorer for your AWS Account / Organization.
 
 ![Example](static/example.jpg)
 ## Tool info:
