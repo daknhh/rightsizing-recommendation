@@ -1,6 +1,6 @@
 import boto3
 import datetime
-from tabulate import tabulate 
+from tabulate import tabulate
 import argparse
 
 def get_recommendation(top,recommendationtarget,benefitsconsidered,ce_assumed_client):
@@ -11,35 +11,31 @@ def get_recommendation(top,recommendationtarget,benefitsconsidered,ce_assumed_cl
     },
         Service='AmazonEC2',
     )
-      
     x = 0
     topint = int(top)
     recommendations = []
     for recommendation in response['RightsizingRecommendations']:
+        reason = ""
         if x != topint:
             key = 'FindingReasonCodes'
             if key in recommendation.keys():
                 for i in recommendation['FindingReasonCodes']:
-                    reason=reason+i
-            else:
-                reason = ''
+                    reason+=i + "\n"
             if recommendation['RightsizingType'] == 'Terminate':
                 savings_to_float = float(recommendation['TerminateRecommendationDetail']['EstimatedMonthlySavings'])
-                dollar = round(savings_to_float,2) 
+                dollar = round(savings_to_float,2)
                 recommendations.extend([[recommendation['AccountId'],recommendation['CurrentInstance']['ResourceId'],recommendation['CurrentInstance']['InstanceName'],recommendation['CurrentInstance']['ResourceDetails']['EC2ResourceDetails']['InstanceType'],recommendation['CurrentInstance']['ResourceDetails']['EC2ResourceDetails']['Platform'],recommendation['RightsizingType'],reason,dollar]])
             else:
                 savings =""
                 for saving in recommendation['ModifyRecommendationDetail']['TargetInstances']:
                     savings_to_float = float(saving['EstimatedMonthlySavings'])
-                    dollar = round(savings_to_float,2)                   
+                    dollar = round(savings_to_float,2)
                     cpu_to_float = float(saving['ExpectedResourceUtilization']['EC2ResourceUtilization']['MaxCpuUtilizationPercentage'])
                     cpu_utilization = round(cpu_to_float,0)
                     savings += f"{saving['ResourceDetails']['EC2ResourceDetails']['InstanceType']} - *{cpu_utilization} % - {dollar}$\n"
-            recommendations.extend([[recommendation['AccountId'],recommendation['CurrentInstance']['ResourceId'],recommendation['CurrentInstance']['InstanceName'],recommendation['CurrentInstance']['ResourceDetails']['EC2ResourceDetails']['InstanceType'],recommendation['CurrentInstance']['ResourceDetails']['EC2ResourceDetails']['Platform'],recommendation['RightsizingType'],reason,savings]])
-        else:
-            return recommendations
+                recommendations.extend([[recommendation['AccountId'],recommendation['CurrentInstance']['ResourceId'],recommendation['CurrentInstance']['InstanceName'],recommendation['CurrentInstance']['ResourceDetails']['EC2ResourceDetails']['InstanceType'],recommendation['CurrentInstance']['ResourceDetails']['EC2ResourceDetails']['Platform'],recommendation['RightsizingType'],reason,savings]])
         x += 1
-
+    return recommendations
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--top', help='--top define how much recommendations you want to get')
@@ -59,7 +55,7 @@ recommendations = get_recommendation(args.top,args.rt,bc,ce_assumed_client)
 headers=["Accound-Id", "Ressource-Id", "Instance-Name", "InstanceType","OS","RightsizingType","Reason","Savings"]
 print(f'\n\n🤑 Get Rightsizing Recommendations from Cost Explorer for your AWS Account / Organization 🧡\n')
 print(f'👨🏻‍💻 - linkedin.com/in/daknhh 🔀 daknhh\n\n ')
-print(f"""⚙️  SETTINGS: \n Recommendations: {args.top} \n RecommendationTarget: {args.rt} \n BenefitsConsidered: {bcicon}\n""")
-print(tabulate(recommendations, headers))
+print(f"""⚙️  SETTINGS: \n Boto3 version: {boto3.__version__} \n Recommendations: {args.top} \n RecommendationTarget: {args.rt} \n BenefitsConsidered: {bcicon}\n""")
+print(tabulate(recommendations,headers))
 generationTime = datetime.datetime.now()
-print(f"""\n ℹ️ Legend: * is Projected CPU utilization\n\n 🗓: {generationTime} +0000 UTC""")
+print(f"""\n ℹ️  Legend: * is Projected CPU utilization\n\n 🗓: {generationTime} +0000 UTC""")
